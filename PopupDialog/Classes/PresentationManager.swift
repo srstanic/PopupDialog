@@ -54,12 +54,12 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
             transition = ZoomTransition(direction: .in)
         case .fadeIn:
             transition = FadeTransition(direction: .in)
-        case .fadeInWithinFlow:
-            transition = FadeInWithinFlowTransitionAnimator(direction: .in)
-        case .flipWithinFlow:
-            transition = Flip3DWithinFlowTransitionAnimator(direction: .in)
-        case .scaleInWithinFlow:
-            transition = ScaleInWithinFlowTransitionAnimator(direction: .in)        }
+        case .fadeInWithinSequence:
+            transition = FadeInWithinSequenceTransitionAnimator(direction: .in)
+        case .flipWithinSequence:
+            transition = Flip3DWithinSequenceTransitionAnimator(direction: .in)
+        case .scaleInWithinSequence:
+            transition = ScaleInWithinSequenceTransitionAnimator(direction: .in)        }
         return transition
     }
 
@@ -79,12 +79,12 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
             transition = ZoomTransition(direction: .out)
         case .fadeIn:
             transition = FadeTransition(direction: .out)
-        case .fadeInWithinFlow:
-            transition = FadeInWithinFlowTransitionAnimator(direction: .out)
-        case .flipWithinFlow:
-            transition = Flip3DWithinFlowTransitionAnimator(direction: .out)
-        case .scaleInWithinFlow:
-            transition = ScaleInWithinFlowTransitionAnimator(direction: .out)
+        case .fadeInWithinSequence:
+            transition = FadeInWithinSequenceTransitionAnimator(direction: .out)
+        case .flipWithinSequence:
+            transition = Flip3DWithinSequenceTransitionAnimator(direction: .out)
+        case .scaleInWithinSequence:
+            transition = ScaleInWithinSequenceTransitionAnimator(direction: .out)
         }
 
         return transition
@@ -96,7 +96,7 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
 }
 
 
-class FadeInWithinFlowTransitionAnimator: TransitionAnimator {
+class FadeInWithinSequenceTransitionAnimator: TransitionAnimator {
     init(direction: AnimationDirection) {
         super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
     }
@@ -140,7 +140,7 @@ class FadeInWithinFlowTransitionAnimator: TransitionAnimator {
     }
 }
 
-class Flip3DWithinFlowTransitionAnimator: TransitionAnimator {
+class Flip3DWithinSequenceTransitionAnimator: TransitionAnimator {
     init(direction: AnimationDirection) {
         super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
     }
@@ -181,7 +181,7 @@ class Flip3DWithinFlowTransitionAnimator: TransitionAnimator {
     }
 }
 
-class FlipWithinFlowTransitionAnimator: TransitionAnimator {
+class FlipWithinSequenceTransitionAnimator: TransitionAnimator {
     init(direction: AnimationDirection) {
         super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
     }
@@ -222,7 +222,7 @@ class FlipWithinFlowTransitionAnimator: TransitionAnimator {
  
    BROKEN, NEEDS FIXING
  */
-class Flip3DAndScaleWithinFlowTransitionAnimator: TransitionAnimator {
+class Flip3DAndScaleWithinSequenceTransitionAnimator: TransitionAnimator {
     init(direction: AnimationDirection) {
         super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
     }
@@ -282,7 +282,7 @@ class Flip3DAndScaleWithinFlowTransitionAnimator: TransitionAnimator {
     }
 }
 
-class ScaleInWithinFlowTransitionAnimator: TransitionAnimator {
+class ScaleInWithinSequenceTransitionAnimator: TransitionAnimator {
     init(direction: AnimationDirection) {
         super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
     }

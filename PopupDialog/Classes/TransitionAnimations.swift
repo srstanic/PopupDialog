@@ -39,9 +39,9 @@ import UIKit
     case bounceDown
     case zoomIn
     case fadeIn
-    case fadeInWithinFlow
-    case flipWithinFlow
-    case scaleInWithinFlow
+    case fadeInWithinSequence
+    case flipWithinSequence
+    case scaleInWithinSequence
 }
 
 /// Dialog bounces in from bottom and is dismissed to bottom

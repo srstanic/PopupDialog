@@ -27,7 +27,7 @@ import Foundation
 import UIKit
 
 /// Creates a Popup dialog similar to UIAlertController
-final public class PopupDialog: UIViewController, ViewControllerFlowable {
+final public class PopupDialog: UIViewController, SequenceableModalViewController {
 
     // MARK: Private / Internal
 
@@ -66,7 +66,7 @@ final public class PopupDialog: UIViewController, ViewControllerFlowable {
     /// Whether or not to shift view for keyboard display
     public var keyboardShiftsView = true
 
-    public var viewControllerFlowDelegate: ViewControllerFlowDelegate?
+    public var sequenceDelegate: ModalViewControllerSequenceDelegate?
 
     // MARK: - Initializers
 
@@ -210,8 +210,8 @@ final public class PopupDialog: UIViewController, ViewControllerFlowable {
      Dismisses the popup dialog
      */
     public func dismiss(_ completion: (() -> Void)? = nil) {
-        if let flowDelegate = viewControllerFlowDelegate {
-            flowDelegate.readyToDismiss(viewController: self, completion: nil)
+        if sequenceDelegate != nil {
+            sequenceDelegate!.readyToDismiss(modalViewController: self, completion: nil)
         } else {
             self.dismiss(animated: true) {
                 completion?()

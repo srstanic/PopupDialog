@@ -111,7 +111,7 @@ open class PopupDialogButton: UIButton {
      */
     public init(title: String,
                 height: Int = 45,
-                dismissOnTap: Bool = true, action: PopupDialogButtonAction?) {
+                dismissOnTap: Bool? = nil, action: PopupDialogButtonAction? = nil) {
 
         // Assign the button height
         buttonHeight = height
@@ -124,7 +124,7 @@ open class PopupDialogButton: UIButton {
         // Set the button title
         setTitle(title, for: UIControlState())
 
-        self.dismissOnTap = dismissOnTap
+        self.dismissOnTap = dismissOnTap ?? (action == nil)
 
         // Setup the views
         setupView()
