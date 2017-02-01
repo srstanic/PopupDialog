@@ -54,8 +54,12 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
             transition = ZoomTransition(direction: .in)
         case .fadeIn:
             transition = FadeTransition(direction: .in)
-        }
-
+        case .fadeInWithinFlow:
+            transition = FadeInWithinFlowTransitionAnimator(direction: .in)
+        case .flipWithinFlow:
+            transition = Flip3DWithinFlowTransitionAnimator(direction: .in)
+        case .scaleInWithinFlow:
+            transition = ScaleInWithinFlowTransitionAnimator(direction: .in)        }
         return transition
     }
 
@@ -75,6 +79,12 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
             transition = ZoomTransition(direction: .out)
         case .fadeIn:
             transition = FadeTransition(direction: .out)
+        case .fadeInWithinFlow:
+            transition = FadeInWithinFlowTransitionAnimator(direction: .out)
+        case .flipWithinFlow:
+            transition = Flip3DWithinFlowTransitionAnimator(direction: .out)
+        case .scaleInWithinFlow:
+            transition = ScaleInWithinFlowTransitionAnimator(direction: .out)
         }
 
         return transition
@@ -82,5 +92,154 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
 
     func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         return interactor.hasStarted ? interactor : nil
+    }
+}
+
+
+class FadeInWithinFlowTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            self.to.view.layoutIfNeeded()
+            let toFrame = self.to.view.subviews[0].frame
+            let fromFrame = self.from.view.subviews[0].frame
+            let toWidth = toFrame.width
+            let toHeight = toFrame.height
+            let fromWidth = fromFrame.width
+            let fromHeight = fromFrame.height
+//            let xScale = endRect.width/startRect.width
+//            let yScale = endRect.height/startRect.height
+//            transform = transform.scaledBy(x: xScale, y: yScale)
+
+            self.to.view.alpha = 0
+            self.to.view.transform = self.to.view.transform.scaledBy(x: fromWidth/toWidth, y: fromHeight/toHeight)
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.alpha = 0
+            })
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseOut], animations: {
+                self.to.view.alpha = 1
+            })
+            UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseOut], animations: {
+                self.from.view.transform = self.from.view.transform.scaledBy(x: toWidth/fromWidth, y: toHeight/fromHeight)
+                self.to.view.transform = CGAffineTransform.identity
+            }) { completed in
+                transitionContext.completeTransition(completed)
+            }
+        case .out:
+            UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.alpha = 0.0
+            }) { (completed) in
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            }
+        }
+    }
+}
+
+class Flip3DWithinFlowTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            //to.view.transform = CGAffineTransform(scaleX: 0, y: 1)
+
+            let perspective = 1.0 / 500.0
+
+            let fromLayer = from.view.layer
+            fromLayer.zPosition = 500 //TODO: will this work when more popups are on the stack?
+            var fromTransform = CATransform3DIdentity
+            fromTransform.m34 = CGFloat(perspective)
+            //fromLayer.transform = fromTransform
+
+            let toLayer = to.view.layer
+            var toTransform = CATransform3DIdentity
+            toTransform.m34 = CGFloat(perspective)
+            toLayer.transform = CATransform3DRotate(
+                toTransform, -.pi/2, 1, 0, 0)
+
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: [.curveEaseIn], animations: {
+                fromLayer.transform = CATransform3DRotate(fromTransform, .pi/2, 1, 0, 0)
+            })
+            UIView.animate(withDuration: 0.25, delay: 0.25, options: [.curveEaseOut], animations: {
+                toLayer.transform = CATransform3DIdentity
+            }) { completed in
+                transitionContext.completeTransition(completed)
+            }
+        case .out:
+            UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.alpha = 0.0
+            }) { (completed) in
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            }
+        }
+    }
+}
+
+class FlipWithinFlowTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            //to.view.transform = CGAffineTransform(scaleX: 0, y: 1)
+            to.view.layer.transform = CATransform3DRotate(
+                to.view.layer.transform, .pi/4.0, 0, 1, 0)
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.transform = CGAffineTransform(scaleX: 0.0001, y: 1)
+            }) { completed in
+                self.from.view.alpha = 0
+            }
+            UIView.animate(withDuration: 0.2, delay: 0.2, options: [.curveEaseOut], animations: {
+                self.to.view.transform = CGAffineTransform.identity
+            }) { completed in
+                transitionContext.completeTransition(completed)
+            }
+        case .out:
+            UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.alpha = 0.0
+            }) { (completed) in
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            }
+        }
+    }
+}
+
+class ScaleInWithinFlowTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            to.view.alpha = 0
+            UIView.animate(withDuration: 0.15, delay: 0.0, options: [.curveEaseOut], animations: {
+                self.from.view.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+                self.from.view.alpha = 0.0
+            })
+            UIView.animate(withDuration: 0.15, delay: 0.15, options: [.curveEaseOut], animations: {
+                self.to.view.alpha = 1
+            }) { completed in
+                transitionContext.completeTransition(completed)
+            }
+        case .out:
+            UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.alpha = 0.0
+            }) { (completed) in
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            }
+        }
     }
 }

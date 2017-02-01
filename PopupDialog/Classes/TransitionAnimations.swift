@@ -39,6 +39,9 @@ import UIKit
     case bounceDown
     case zoomIn
     case fadeIn
+    case fadeInWithinFlow
+    case flipWithinFlow
+    case scaleInWithinFlow
 }
 
 /// Dialog bounces in from bottom and is dismissed to bottom
@@ -84,7 +87,7 @@ final internal class BounceDownTransition: TransitionAnimator {
         switch direction {
         case .in:
             to.view.bounds.origin = CGPoint(x: 0, y: from.view.bounds.size.height)
-            UIView.animate(withDuration: 0.6, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0, options: [.curveEaseOut], animations: {
+            UIView.animate(withDuration: 0.35, delay: 0.0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: [.curveEaseOut], animations: {
                 self.to.view.bounds = self.from.view.bounds
             }) { (completed) in
                 transitionContext.completeTransition(completed)

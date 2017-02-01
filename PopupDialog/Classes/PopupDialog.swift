@@ -27,7 +27,7 @@ import Foundation
 import UIKit
 
 /// Creates a Popup dialog similar to UIAlertController
-final public class PopupDialog: UIViewController {
+final public class PopupDialog: UIViewController, ViewControllerFlowable {
 
     // MARK: Private / Internal
 
@@ -57,6 +57,7 @@ final public class PopupDialog: UIViewController {
     /// Keyboard height
     internal var keyboardHeight: CGFloat? = nil
 
+    internal var transitionOverlay: PopupDialogOverlayView?
     // MARK: Public
 
     /// The content view of the popup dialog
@@ -64,6 +65,8 @@ final public class PopupDialog: UIViewController {
 
     /// Whether or not to shift view for keyboard display
     public var keyboardShiftsView = true
+
+    public var viewControllerFlowDelegate: ViewControllerFlowDelegate?
 
     // MARK: - Initializers
 
@@ -207,8 +210,12 @@ final public class PopupDialog: UIViewController {
      Dismisses the popup dialog
      */
     public func dismiss(_ completion: (() -> Void)? = nil) {
-        self.dismiss(animated: true) {
-            completion?()
+        if let flowDelegate = viewControllerFlowDelegate {
+            flowDelegate.readyToDismiss(viewController: self, completion: nil)
+        } else {
+            self.dismiss(animated: true) {
+                completion?()
+            }
         }
     }
 

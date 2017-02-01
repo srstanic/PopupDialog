@@ -34,22 +34,35 @@ final internal class PresentationController: UIPresentationController {
 
     override init(presentedViewController: UIViewController, presenting presentingViewController: UIViewController?) {
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
-        overlay.blurView.underlyingView = presentingViewController?.view
-        overlay.frame = (presentingViewController?.view.bounds)!
+        if !(presentingViewController is PopupDialog) {
+            overlay.blurView.underlyingView = presentingViewController?.view
+            overlay.frame = (presentingViewController?.view.bounds)!
+
+        }
     }
 
     override func presentationTransitionWillBegin() {
-        overlay.frame = containerView!.bounds
-        containerView!.insertSubview(overlay, at: 0)
-
-        presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (coordinatorContext) -> Void in
-            self.overlay.alpha = 1.0
-        }, completion: nil)
+        if let presentingPopupDialog = presentingViewController as? PopupDialog {
+            (presentedViewController as? PopupDialog)?.transitionOverlay = presentingPopupDialog.transitionOverlay
+        } else {
+            overlay.frame = containerView!.bounds
+            containerView!.insertSubview(overlay, at: 0)
+            presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (coordinatorContext) -> Void in
+                self.overlay.alpha = 1.0
+            }, completion: nil)
+            (presentedViewController as? PopupDialog)?.transitionOverlay = overlay
+        }
     }
 
     override func dismissalTransitionWillBegin() {
+        let overlay: PopupDialogOverlayView?
+        if let presentingPopupDialog = presentingViewController as? PopupDialog {
+            overlay = presentingPopupDialog.transitionOverlay
+        } else {
+            overlay = self.overlay
+        }
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (coordinatorContext) -> Void in
-            self.overlay.alpha = 0.0
+            overlay?.alpha = 0.0
         }, completion: nil)
     }
 
