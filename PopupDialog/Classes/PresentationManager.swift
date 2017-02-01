@@ -149,8 +149,6 @@ class Flip3DWithinFlowTransitionAnimator: TransitionAnimator {
 
         switch direction {
         case .in:
-            //to.view.transform = CGAffineTransform(scaleX: 0, y: 1)
-
             let perspective = 1.0 / 500.0
 
             let fromLayer = from.view.layer
@@ -205,6 +203,75 @@ class FlipWithinFlowTransitionAnimator: TransitionAnimator {
             }) { completed in
                 transitionContext.completeTransition(completed)
             }
+        case .out:
+            UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
+                self.from.view.alpha = 0.0
+            }) { (completed) in
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            }
+        }
+    }
+}
+
+/* 
+   1. rotate 'from' view for .pi/2
+   2. remove its contents so that it looks like it's just a rectangle with a background
+   3. rotate 'from' view further .pi/2 so that it's completely flipped now
+   4. scale it to the size of the 'to' view
+   5. fade in 'to' view into properly positioned and sized "frame" created by transformed 'from' view
+ 
+   BROKEN, NEEDS FIXING
+ */
+class Flip3DAndScaleWithinFlowTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            let perspective = 1.0 / 500.0
+
+            let fromLayer = from.view.layer
+            fromLayer.zPosition = 500 //TODO: will this work when more popups are on the stack?
+            var fromTransform = CATransform3DIdentity
+            fromTransform.m34 = CGFloat(perspective)
+
+            self.to.view.layoutIfNeeded()
+            let toFrame = self.to.view.subviews[0].frame
+            let fromFrame = self.from.view.subviews[0].frame
+            let toWidth = toFrame.width
+            let toHeight = toFrame.height
+            let fromWidth = fromFrame.width
+            let fromHeight = fromFrame.height
+            self.to.view.alpha = 0
+
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseIn], animations: {
+                fromLayer.transform = CATransform3DRotate(fromTransform, .pi, 1, 0, 0)
+            })
+            UIView.animate(withDuration: 0.2, delay: 0.2, options: [.curveEaseIn], animations: {
+//                fromLayer.transform = CATransform3DRotate(fromTransform, .pi, 1, 0, 0)
+                self.from.view.transform = self.from.view.transform.scaledBy(x: toWidth/fromWidth, y: toHeight/fromHeight)
+            })
+            UIView.animate(withDuration: 0.2, delay: 0.4, options: [.curveEaseOut], animations: {
+                self.from.view.alpha = 0
+                self.to.view.alpha = 1
+            }){ completed in
+                transitionContext.completeTransition(completed)
+            }
+//            let toLayer = to.view.layer
+//            var toTransform = CATransform3DIdentity
+//            toTransform.m34 = CGFloat(perspective)
+//            toLayer.transform = CATransform3DRotate(
+//                toTransform, -.pi/2, 1, 0, 0)
+//            UIView.animate(withDuration: 0.25, delay: 0.25, options: [.curveEaseOut], animations: {
+//                toLayer.transform = CATransform3DIdentity
+//            }) { completed in
+//
+//                transitionContext.completeTransition(completed)
+//            }
+
         case .out:
             UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
                 self.from.view.alpha = 0.0
