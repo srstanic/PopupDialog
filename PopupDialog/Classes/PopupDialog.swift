@@ -211,7 +211,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
      */
     public func dismiss(_ completion: (() -> Void)? = nil) {
         if sequenceDelegate != nil {
-            sequenceDelegate!.readyToDismiss(modalViewController: self, completion: nil)
+            sequenceDelegate!.readyToDismiss(modalViewController: self, completion: completion)
         } else {
             self.dismiss(animated: true) {
                 completion?()
