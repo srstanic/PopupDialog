@@ -109,7 +109,7 @@ open class PopupDialogButton: UIButton {
 
      - returns: PopupDialogButton
      */
-    public init(title: String,
+    required public init(title: String,
                 height: Int = 45,
                 dismissOnTap: Bool? = nil, action: PopupDialogButtonAction? = nil) {
 
