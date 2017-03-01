@@ -90,7 +90,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
                 image: UIImage? = nil,
                 buttonAlignment: UILayoutConstraintAxis = .vertical,
                 transitionStyle: PopupDialogTransitionStyle = .bounceUp,
-                gestureDismissal: Bool = true,
+                gestureDismissal: Bool = false,
                 completion: (() -> Void)? = nil) {
 
         // Create and configure the standard popup dialog view
