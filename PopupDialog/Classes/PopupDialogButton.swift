@@ -144,6 +144,7 @@ open class PopupDialogButton: UIButton {
         backgroundColor               = defaultButtonColor
         separator.backgroundColor     = defaultSeparatorColor
         leftSeparator.backgroundColor = defaultSeparatorColor
+        let separatorThickness = 1/UIScreen.main.scale
 
         // Add and layout views
         addSubview(separator)
@@ -154,8 +155,8 @@ open class PopupDialogButton: UIButton {
         var constraints = [NSLayoutConstraint]()
         constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:[button(buttonHeight)]", options: [], metrics: metrics, views: views)
         constraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[separator]|", options: [], metrics: nil, views: views)
-        constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[separator(1)]", options: [], metrics: nil, views: views)
-        constraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[leftSeparator(1)]", options: [], metrics: nil, views: views)
+        constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[separator(\(separatorThickness))]", options: [], metrics: nil, views: views)
+        constraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[leftSeparator(\(separatorThickness))]", options: [], metrics: nil, views: views)
         constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[leftSeparator]|", options: [], metrics: nil, views: views)
         NSLayoutConstraint.activate(constraints)
     }

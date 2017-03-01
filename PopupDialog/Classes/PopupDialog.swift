@@ -86,6 +86,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
     public convenience init(
                 title: String?,
                 message: String?,
+                messageTextAlignment: NSTextAlignment? = nil,
                 image: UIImage? = nil,
                 buttonAlignment: UILayoutConstraintAxis = .vertical,
                 transitionStyle: PopupDialogTransitionStyle = .bounceUp,
@@ -97,6 +98,10 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
         viewController.titleText   = title
         viewController.messageText = message
         viewController.image       = image
+
+        if messageTextAlignment != nil {
+            viewController.messageTextAlignment = messageTextAlignment!
+        }
 
         // Call designated initializer
         self.init(viewController: viewController, buttonAlignment: buttonAlignment, transitionStyle: transitionStyle, gestureDismissal: gestureDismissal, completion: completion)
