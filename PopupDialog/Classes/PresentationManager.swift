@@ -118,10 +118,10 @@ class FadeInWithinSequenceTransitionAnimator: TransitionAnimator {
 
             self.to.view.alpha = 0
             self.to.view.transform = self.to.view.transform.scaledBy(x: fromWidth/toWidth, y: fromHeight/toHeight)
-            UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseIn], animations: {
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseIn], animations: {
                 self.from.view.alpha = 0
             })
-            UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseOut], animations: {
+            UIView.animate(withDuration: 0.2, delay: 0.1, options: [.curveEaseOut], animations: {
                 self.to.view.alpha = 1
             })
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseOut], animations: {
@@ -163,10 +163,10 @@ class Flip3DWithinSequenceTransitionAnimator: TransitionAnimator {
             toLayer.transform = CATransform3DRotate(
                 toTransform, -.pi/2, 1, 0, 0)
 
-            UIView.animate(withDuration: 0.25, delay: 0.0, options: [.curveEaseIn], animations: {
+            UIView.animate(withDuration: 0.15, delay: 0.0, options: [.curveEaseIn], animations: {
                 fromLayer.transform = CATransform3DRotate(fromTransform, .pi/2, 1, 0, 0)
             })
-            UIView.animate(withDuration: 0.25, delay: 0.25, options: [.curveEaseOut], animations: {
+            UIView.animate(withDuration: 0.15, delay: 0.15, options: [.curveEaseOut], animations: {
                 toLayer.transform = CATransform3DIdentity
             }) { completed in
                 transitionContext.completeTransition(completed)
@@ -193,12 +193,12 @@ class FlipWithinSequenceTransitionAnimator: TransitionAnimator {
             //to.view.transform = CGAffineTransform(scaleX: 0, y: 1)
             to.view.layer.transform = CATransform3DRotate(
                 to.view.layer.transform, .pi/4.0, 0, 1, 0)
-            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseIn], animations: {
+            UIView.animate(withDuration: 0.15, delay: 0.0, options: [.curveEaseIn], animations: {
                 self.from.view.transform = CGAffineTransform(scaleX: 0.0001, y: 1)
             }) { completed in
                 self.from.view.alpha = 0
             }
-            UIView.animate(withDuration: 0.2, delay: 0.2, options: [.curveEaseOut], animations: {
+            UIView.animate(withDuration: 0.15, delay: 0.15, options: [.curveEaseOut], animations: {
                 self.to.view.transform = CGAffineTransform.identity
             }) { completed in
                 transitionContext.completeTransition(completed)

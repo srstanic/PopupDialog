@@ -87,7 +87,7 @@ final internal class BounceDownTransition: TransitionAnimator {
         switch direction {
         case .in:
             to.view.bounds.origin = CGPoint(x: 0, y: from.view.bounds.size.height)
-            UIView.animate(withDuration: 0.35, delay: 0.0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: [.curveEaseOut], animations: {
+            UIView.animate(withDuration: 0.25, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0, options: [.curveEaseOut], animations: {
                 self.to.view.bounds = self.from.view.bounds
             }) { (completed) in
                 transitionContext.completeTransition(completed)
@@ -145,7 +145,7 @@ final internal class FadeTransition: TransitionAnimator {
         switch direction {
         case .in:
             to.view.alpha = 0
-            UIView.animate(withDuration: 0.6, delay: 0.0, options: [.curveEaseOut],
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: [.curveEaseOut],
             animations: {
                 self.to.view.alpha = 1
             }) { (completed) in
