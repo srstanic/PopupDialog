@@ -23,7 +23,7 @@ public protocol ModalViewControllerSequenceDelegate: class {}
 // so someone using this extension would need to cast UIViewController into
 // ModalViewControllerSequenceDelegate or vice versa all the time. So I'd rather do this
 // casting within the extension. It should make the usage of this extension simpler.
-extension ModalViewControllerSequenceDelegate {
+public extension ModalViewControllerSequenceDelegate {
 
     /// Last modal view controller in a sequence calls this method to collapse the sequence.
     ///
