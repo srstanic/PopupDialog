@@ -54,12 +54,13 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
             transition = ZoomTransition(direction: .in)
         case .fadeIn:
             transition = FadeTransition(direction: .in)
-        case .fadeInWithinSequence:
-            transition = FadeInWithinSequenceTransitionAnimator(direction: .in)
-        case .flipWithinSequence:
-            transition = Flip3DWithinSequenceTransitionAnimator(direction: .in)
-        case .scaleInWithinSequence:
-            transition = ScaleInWithinSequenceTransitionAnimator(direction: .in)        }
+        case .bounceDownAndFadeOut:
+            transition = BounceDownAndFadeOutTransitionAnimator(direction: .in)
+        case .flip3DAndFadeOut:
+            transition = Flip3DAndFadeOutTransitionAnimator(direction: .in)
+        case .flip3DAndBounceUp:
+            transition = Flip3DAndBounceUpTransitionAnimator(direction: .in)
+        }
         return transition
     }
 
@@ -79,12 +80,12 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
             transition = ZoomTransition(direction: .out)
         case .fadeIn:
             transition = FadeTransition(direction: .out)
-        case .fadeInWithinSequence:
-            transition = FadeInWithinSequenceTransitionAnimator(direction: .out)
-        case .flipWithinSequence:
-            transition = Flip3DWithinSequenceTransitionAnimator(direction: .out)
-        case .scaleInWithinSequence:
-            transition = ScaleInWithinSequenceTransitionAnimator(direction: .out)
+        case .bounceDownAndFadeOut:
+            transition = BounceDownAndFadeOutTransitionAnimator(direction: .out)
+        case .flip3DAndFadeOut:
+            transition = Flip3DAndFadeOutTransitionAnimator(direction: .out)
+        case .flip3DAndBounceUp:
+            transition = Flip3DAndBounceUpTransitionAnimator(direction: .out)
         }
 
         return transition
@@ -95,6 +96,105 @@ final internal class PresentationManager: NSObject, UIViewControllerTransitionin
     }
 }
 
+fileprivate func flip3D(from: UIViewController, to: UIViewController, transitionContext: UIViewControllerContextTransitioning) {
+    let perspective = 1.0 / 500.0
+
+    let fromLayer = from.view.layer
+    fromLayer.zPosition = 500 //TODO: will this work when more popups are on the stack?
+    var fromTransform = CATransform3DIdentity
+    fromTransform.m34 = CGFloat(perspective)
+    //fromLayer.transform = fromTransform
+
+    let toLayer = to.view.layer
+    var toTransform = CATransform3DIdentity
+    toTransform.m34 = CGFloat(perspective)
+    toLayer.transform = CATransform3DRotate(
+        toTransform, -.pi/2, 1, 0, 0)
+
+    UIView.animate(withDuration: 0.15, delay: 0.0, options: [.curveEaseIn], animations: {
+        fromLayer.transform = CATransform3DRotate(fromTransform, .pi/2, 1, 0, 0)
+    })
+    UIView.animate(withDuration: 0.15, delay: 0.15, options: [.curveEaseOut], animations: {
+        toLayer.transform = CATransform3DIdentity
+    }) { completed in
+        transitionContext.completeTransition(completed)
+    }
+}
+fileprivate func fadeOut(from: UIViewController, to: UIViewController, transitionContext: UIViewControllerContextTransitioning) {
+    UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseIn], animations: {
+        from.view.alpha = 0.0
+    }) { (completed) in
+        transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+    }
+}
+fileprivate func bounceDown(from: UIViewController, to: UIViewController, transitionContext: UIViewControllerContextTransitioning) {
+    to.view.bounds.origin = CGPoint(x: 0, y: from.view.bounds.size.height)
+    UIView.animate(withDuration: 0.25, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0, options: [.curveEaseOut], animations: {
+        to.view.bounds = from.view.bounds
+    }) { (completed) in
+        transitionContext.completeTransition(completed)
+    }
+}
+fileprivate func bounceUp(from: UIViewController, to: UIViewController, transitionContext: UIViewControllerContextTransitioning) {
+    UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseIn], animations: {
+        from.view.bounds.origin = CGPoint(x: 0, y: -from.view.bounds.size.height)
+        from.view.alpha = 0.0
+    }) { (completed) in
+        transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+    }
+}
+
+class BounceDownAndFadeOutTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            bounceDown(from: from, to: to, transitionContext: transitionContext)
+        case .out:
+            fadeOut(from: from, to: to, transitionContext: transitionContext)
+        }
+    }
+}
+
+class Flip3DAndFadeOutTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            flip3D(from: from, to: to, transitionContext: transitionContext)
+        case .out:
+            fadeOut(from: from, to: to, transitionContext: transitionContext)
+        }
+    }
+}
+
+class Flip3DAndBounceUpTransitionAnimator: TransitionAnimator {
+    init(direction: AnimationDirection) {
+        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
+    }
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        super.animateTransition(using: transitionContext)
+
+        switch direction {
+        case .in:
+            flip3D(from: from, to: to, transitionContext: transitionContext)
+        case .out:
+            bounceUp(from: from, to: to, transitionContext: transitionContext)
+        }
+    }
+}
+
+//
+// - MARK: animators below this line are not used
+//
 
 class FadeInWithinSequenceTransitionAnimator: TransitionAnimator {
     init(direction: AnimationDirection) {
@@ -112,9 +212,9 @@ class FadeInWithinSequenceTransitionAnimator: TransitionAnimator {
             let toHeight = toFrame.height
             let fromWidth = fromFrame.width
             let fromHeight = fromFrame.height
-//            let xScale = endRect.width/startRect.width
-//            let yScale = endRect.height/startRect.height
-//            transform = transform.scaledBy(x: xScale, y: yScale)
+            //            let xScale = endRect.width/startRect.width
+            //            let yScale = endRect.height/startRect.height
+            //            transform = transform.scaledBy(x: xScale, y: yScale)
 
             self.to.view.alpha = 0
             self.to.view.transform = self.to.view.transform.scaledBy(x: fromWidth/toWidth, y: fromHeight/toHeight)
@@ -127,47 +227,6 @@ class FadeInWithinSequenceTransitionAnimator: TransitionAnimator {
             UIView.animate(withDuration: 0.3, delay: 0.0, options: [.curveEaseOut], animations: {
                 self.from.view.transform = self.from.view.transform.scaledBy(x: toWidth/fromWidth, y: toHeight/fromHeight)
                 self.to.view.transform = CGAffineTransform.identity
-            }) { completed in
-                transitionContext.completeTransition(completed)
-            }
-        case .out:
-            UIView.animate(withDuration: outDuration, delay: 0.0, options: [.curveEaseIn], animations: {
-                self.from.view.alpha = 0.0
-            }) { (completed) in
-                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-            }
-        }
-    }
-}
-
-class Flip3DWithinSequenceTransitionAnimator: TransitionAnimator {
-    init(direction: AnimationDirection) {
-        super.init(inDuration: 0.22, outDuration: 0.2, direction: direction)
-    }
-    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        super.animateTransition(using: transitionContext)
-
-        switch direction {
-        case .in:
-            let perspective = 1.0 / 500.0
-
-            let fromLayer = from.view.layer
-            fromLayer.zPosition = 500 //TODO: will this work when more popups are on the stack?
-            var fromTransform = CATransform3DIdentity
-            fromTransform.m34 = CGFloat(perspective)
-            //fromLayer.transform = fromTransform
-
-            let toLayer = to.view.layer
-            var toTransform = CATransform3DIdentity
-            toTransform.m34 = CGFloat(perspective)
-            toLayer.transform = CATransform3DRotate(
-                toTransform, -.pi/2, 1, 0, 0)
-
-            UIView.animate(withDuration: 0.15, delay: 0.0, options: [.curveEaseIn], animations: {
-                fromLayer.transform = CATransform3DRotate(fromTransform, .pi/2, 1, 0, 0)
-            })
-            UIView.animate(withDuration: 0.15, delay: 0.15, options: [.curveEaseOut], animations: {
-                toLayer.transform = CATransform3DIdentity
             }) { completed in
                 transitionContext.completeTransition(completed)
             }
