@@ -142,11 +142,15 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
         // Add our custom view to the container
         if #available(iOS 9.0, *) {
             if let stackView = popupContainerView.stackView as? UIStackView {
+                addChildViewController(viewController)
                 stackView.insertArrangedSubview(viewController.view, at: 0)
+                viewController.didMove(toParentViewController: self)
             }
         } else {
             if let stackView = popupContainerView.stackView as? TZStackView {
+                addChildViewController(viewController)
                 stackView.insertArrangedSubview(viewController.view, at: 0)
+                viewController.didMove(toParentViewController: self)
             }
         }
 
@@ -166,6 +170,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
             let panRecognizer = UIPanGestureRecognizer(target: interactor, action: #selector(InteractiveTransition.handlePan))
             popupContainerView.stackView.addGestureRecognizer(panRecognizer)
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+            tapRecognizer.cancelsTouchesInView = false
             popupContainerView.addGestureRecognizer(tapRecognizer)
         }
     }
