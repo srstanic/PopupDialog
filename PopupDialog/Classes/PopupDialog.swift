@@ -88,7 +88,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
                 message: String?,
                 messageTextAlignment: NSTextAlignment? = nil,
                 image: UIImage? = nil,
-                buttonAlignment: UILayoutConstraintAxis = .vertical,
+                buttonAlignment: NSLayoutConstraint.Axis = .vertical,
                 transitionStyle: PopupDialogTransitionStyle = .bounceUp,
                 gestureDismissal: Bool = false,
                 completion: (() -> Void)? = nil) {
@@ -120,7 +120,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
      */
     public init(
         viewController: UIViewController,
-        buttonAlignment: UILayoutConstraintAxis = .vertical,
+        buttonAlignment: NSLayoutConstraint.Axis = .vertical,
         transitionStyle: PopupDialogTransitionStyle = .bounceUp,
         gestureDismissal: Bool = true,
         completion: (() -> Void)? = nil) {
@@ -142,15 +142,15 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
         // Add our custom view to the container
         if #available(iOS 9.0, *) {
             if let stackView = popupContainerView.stackView as? UIStackView {
-                addChildViewController(viewController)
+                addChild(viewController)
                 stackView.insertArrangedSubview(viewController.view, at: 0)
-                viewController.didMove(toParentViewController: self)
+                viewController.didMove(toParent: self)
             }
         } else {
             if let stackView = popupContainerView.stackView as? TZStackView {
-                addChildViewController(viewController)
+                addChild(viewController)
                 stackView.insertArrangedSubview(viewController.view, at: 0)
-                viewController.didMove(toParentViewController: self)
+                viewController.didMove(toParent: self)
             }
         }
 
@@ -305,7 +305,7 @@ final public class PopupDialog: UIViewController, SequenceableModalViewControlle
 extension PopupDialog {
 
     /// The button alignment of the alert dialog
-    public var buttonAlignment: UILayoutConstraintAxis {
+    public var buttonAlignment: NSLayoutConstraint.Axis {
         get {
             if #available(iOS 9.0, *) {
                 let buttonStackView = popupContainerView.buttonStackView as! UIStackView

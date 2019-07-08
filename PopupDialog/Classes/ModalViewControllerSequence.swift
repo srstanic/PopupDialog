@@ -60,5 +60,5 @@ public extension ModalViewControllerSequenceDelegate {
     with each new SequenceableModalViewController added so that the last one can call readyToDismiss() on it.
  */
 public protocol SequenceableModalViewController {
-    weak var sequenceDelegate: ModalViewControllerSequenceDelegate? {get set}
+    var sequenceDelegate: ModalViewControllerSequenceDelegate? {get set}
 }
